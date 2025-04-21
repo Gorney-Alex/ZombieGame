@@ -1,0 +1,117 @@
+using UnityEngine;
+
+public class PlayerMovements : MonoBehaviour
+{
+    [SerializeField] private float _speedWalk = 10;
+    [SerializeField] private float _speedRun = 20;
+    [SerializeField] private float _jumpForce = 5;
+    [SerializeField] private float _mouseSensitivity = 150;
+    [SerializeField] private float _characterGravityForce = -20f;
+    [SerializeField] private bool _isGrounded = false;
+    [SerializeField] private float _groundDistance = 0.4f;
+    private const string IS_WALK = "_isWalk";
+    private const string IS_RUN = "_isRun";
+    [SerializeField] private LayerMask _groundMask;
+    [SerializeField] private Transform _groundChecker;
+
+    private float _xRoatation = 0;
+    private float _yRoatation = 0;
+    Vector3 move;
+    private Vector3 _playerGravity;
+
+    private CharacterController _characterController;
+    private Camera _playerCamera;
+    private Animator _animator;
+
+    [SerializeField] private InputControlsScript _inputControlsScript;
+
+    private void Awake()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        _characterController = GetComponent<CharacterController>();
+        _playerCamera = GetComponentInChildren<Camera>();
+        _animator = GetComponent<Animator>();
+
+
+        _inputControlsScript.JumpEvent.AddListener(OnJump);
+        _inputControlsScript.UseEvent.AddListener(OnUse);
+    }
+
+    private void Update()
+    {
+        _isGrounded = CheckIsGrounded();
+        CharacterGravity();
+        OnMove();
+        OnCameraLook();
+        UpdateMovementState();
+    }
+
+    private void OnCameraLook()
+    {
+        float mouseX = _inputControlsScript.Look.x * _mouseSensitivity * Time.deltaTime;
+        float mouseY = _inputControlsScript.Look.y * _mouseSensitivity * Time.deltaTime;
+
+        _xRoatation -= mouseY;
+        _xRoatation = Mathf.Clamp(_xRoatation, -90f, 90f);
+
+        _yRoatation += mouseX;
+
+        _playerCamera.transform.localRotation = Quaternion.Euler(_xRoatation, -90, 0);
+        transform.rotation = Quaternion.Euler(0, _yRoatation, 0);
+    }
+
+    private void OnMove()
+{
+    Vector2 moveInput = _inputControlsScript.Move;
+    move = transform.right * moveInput.x + transform.forward * moveInput.y;
+
+    float currentSpeed = _inputControlsScript.IsRun ? _speedRun : _speedWalk;
+    _characterController.Move(move * currentSpeed * Time.deltaTime);
+}
+
+    private void OnJump()
+    {
+        if (_isGrounded)
+        {
+            _playerGravity.y = Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce);
+        }
+    }
+
+    private void UpdateMovementState()
+    {
+        float moveAmount = new Vector2(move.x, move.z).magnitude;
+        
+        bool isWalking = moveAmount > 0.1f;
+        
+        bool isRunning = isWalking && _inputControlsScript.IsRun;
+        
+        _animator.SetBool(IS_WALK, isWalking && !isRunning);
+        _animator.SetBool(IS_RUN, isRunning);
+    }
+
+    private void OnUse()
+    {
+        Debug.Log("Use item");
+    }
+    
+
+    private void CharacterGravity()
+    {
+        if (_isGrounded && _playerGravity.y < 0)
+        {
+            _playerGravity.y = -2f;
+        }
+
+        _playerGravity.y += _characterGravityForce * Time.deltaTime;
+        _characterController.Move(_playerGravity * Time.deltaTime);
+    }
+
+    private bool CheckIsGrounded()
+    {
+        return Physics.CheckSphere(_groundChecker.position, _groundDistance, _groundMask);
+    }
+
+
+
+}
