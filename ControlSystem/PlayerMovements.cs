@@ -9,10 +9,16 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private float _characterGravityForce = -20f;
     [SerializeField] private bool _isGrounded = false;
     [SerializeField] private float _groundDistance = 0.4f;
+    [SerializeField] private const float SPINE_MAX_TILT = 30;
     private const string IS_WALK = "_isWalk";
     private const string IS_RUN = "_isRun";
     [SerializeField] private LayerMask _groundMask;
     [SerializeField] private Transform _groundChecker;
+
+    [SerializeField] private Transform _spineBone;
+    [SerializeField] private Transform _chestBone;
+    [SerializeField] private Transform _neckBone;
+    [SerializeField] private Transform _headBone;
 
     private float _xRoatation = 0;
     private float _yRoatation = 0;
@@ -20,7 +26,6 @@ public class PlayerMovements : MonoBehaviour
     private Vector3 _playerGravity;
 
     private CharacterController _characterController;
-    private Camera _playerCamera;
     private Animator _animator;
 
     [SerializeField] private InputControlsScript _inputControlsScript;
@@ -30,7 +35,6 @@ public class PlayerMovements : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         _characterController = GetComponent<CharacterController>();
-        _playerCamera = GetComponentInChildren<Camera>();
         _animator = GetComponent<Animator>();
 
 
@@ -47,6 +51,11 @@ public class PlayerMovements : MonoBehaviour
         UpdateMovementState();
     }
 
+    private void LateUpdate()
+    {
+        UpdateBonesRotation();
+    }
+
     private void OnCameraLook()
     {
         float mouseX = _inputControlsScript.Look.x * _mouseSensitivity * Time.deltaTime;
@@ -57,18 +66,34 @@ public class PlayerMovements : MonoBehaviour
 
         _yRoatation += mouseX;
 
-        _playerCamera.transform.localRotation = Quaternion.Euler(_xRoatation, -90, 0);
         transform.rotation = Quaternion.Euler(0, _yRoatation, 0);
     }
 
-    private void OnMove()
-{
-    Vector2 moveInput = _inputControlsScript.Move;
-    move = transform.right * moveInput.x + transform.forward * moveInput.y;
+    private void UpdateBonesRotation()
+    {
+        float tilt = Mathf.Clamp(_xRoatation, -SPINE_MAX_TILT, SPINE_MAX_TILT);
 
-    float currentSpeed = _inputControlsScript.IsRun ? _speedRun : _speedWalk;
-    _characterController.Move(move * currentSpeed * Time.deltaTime);
-}
+        if (_spineBone != null)
+            _spineBone.localRotation = Quaternion.Euler(0, 0, tilt * 0.3f);
+
+        if (_chestBone != null)
+            _chestBone.localRotation = Quaternion.Euler(0, 0, tilt * 0.5f);
+
+        if (_neckBone != null)
+            _neckBone.localRotation = Quaternion.Euler(0, 0, tilt * 0.7f);
+
+        if (_headBone != null)
+            _headBone.localRotation = Quaternion.Euler(0, 0, tilt);
+    }
+
+    private void OnMove()
+    {
+        Vector2 moveInput = _inputControlsScript.Move;
+        move = transform.right * moveInput.x + transform.forward * moveInput.y;
+
+        float currentSpeed = _inputControlsScript.IsRun ? _speedRun : _speedWalk;
+        _characterController.Move(move * currentSpeed * Time.deltaTime);
+    }
 
     private void OnJump()
     {
