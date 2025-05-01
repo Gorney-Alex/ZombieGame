@@ -20,6 +20,13 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private Transform _neckBone;
     [SerializeField] private Transform _headBone;
 
+    [SerializeField] private float _standingHeight = 2.6f;
+    [SerializeField] private float _crouchingHeight = 1.8f;
+    [SerializeField] private float _crouchSpeed = 5f;
+    [SerializeField] private string IS_CROUCH = "_isCrouch";
+
+    private bool _isCrouched = false;
+
     private float _xRoatation = 0;
     private float _yRoatation = 0;
     Vector3 move;
@@ -40,6 +47,7 @@ public class PlayerMovements : MonoBehaviour
 
         _inputControlsScript.JumpEvent.AddListener(OnJump);
         _inputControlsScript.UseEvent.AddListener(OnUse);
+        _inputControlsScript.CrouchEvent.AddListener(OnCrouch);
     }
 
     private void Update()
@@ -101,6 +109,24 @@ public class PlayerMovements : MonoBehaviour
         {
             _playerGravity.y = Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce);
         }
+    }
+
+    private void OnCrouch()
+    {
+        bool wantToCrouch = !_inputControlsScript.IsCrouching;
+
+        // if (!wantToCrouch && Physics.SphereCast(transform.position, 0.3f, Vector3.up, out _, 1f, _groundMask))
+        // {
+        //     Debug.Log("Нельзя встать: над головой препятствие");
+        //     return;
+        // }
+
+        typeof(InputControlsScript)
+            .GetField("_isCrouching", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.SetValue(_inputControlsScript, wantToCrouch);
+
+        _characterController.height = wantToCrouch ? _crouchingHeight : _standingHeight;
+        _characterController.center = new Vector3(0, _characterController.height / 2f, 0);
     }
 
     private void UpdateMovementState()
