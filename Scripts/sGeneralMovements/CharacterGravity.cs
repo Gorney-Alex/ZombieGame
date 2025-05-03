@@ -22,4 +22,14 @@ public class CharacterGravity
         _gravityVelocity.y += _gravityForce * Time.deltaTime;
         _characterController.Move(_gravityVelocity * Time.deltaTime);
     }
+
+    public void SetYVelocity(float yVelocity)
+    {
+        _gravityVelocity.y = yVelocity;
+    }
+
+    public float GetYVelocity()
+    {
+        return _gravityVelocity.y;
+    }
 }

@@ -768,9 +768,8 @@ GameObject:
   - component: {fileID: 9178574285366769767}
   - component: {fileID: 8683614343397923552}
   - component: {fileID: 3221292698524635766}
-  - component: {fileID: 1035529313608520733}
   m_Layer: 6
-  m_Name: Model_0
+  m_Name: Model_1
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -896,37 +895,6 @@ MonoBehaviour:
   CrouchEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1035529313608520733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3657822190066735047}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a63afad1ac14294883f9adc64b06e1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speedWalk: 10
-  _speedRun: 15
-  _jumpForce: 5
-  _mouseSensitivity: 150
-  _characterGravityForce: -20
-  _isGrounded: 0
-  _groundDistance: 0.4
-  _groundMask:
-    serializedVersion: 2
-    m_Bits: 8
-  _groundChecker: {fileID: 7469400981344890283}
-  _spineBone: {fileID: 5268750451776274251}
-  _chestBone: {fileID: 3008472058715061036}
-  _neckBone: {fileID: 1638882938485372985}
-  _headBone: {fileID: 5925702273331635356}
-  _standingHeight: 2.6
-  _crouchingHeight: 1.3
-  _crouchSpeed: 5
-  _inputControlsScript: {fileID: 3221292698524635766}
 --- !u!1 &3872397876346661812
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlayerMotor : MonoBehaviour
+public class PlayerMotor : MonoBehaviour
 {
     [Header("Components")]
     private CharacterGravity _characterGravity;
@@ -26,10 +26,11 @@ public abstract class PlayerMotor : MonoBehaviour
     
     private float _xRotation = 0;
     private float _yRotation = 0;
+    Vector3 move;
 
-    private Transform _groundChecker;
     [SerializeField] private LayerMask _groundMask;
-    
+
+    CharacterController _characterController;
 
 
     private void Awake()
@@ -37,11 +38,11 @@ public abstract class PlayerMotor : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         
         var groundCheckerMarker = GetComponentInChildren<GroundCheckerComponent>();
-        _groundChecker = groundCheckerMarker.transform;
-        _checkCharacterGrounded = new CheckCharacterGrounded(_groundChecker, _groundMask);
+        Transform groundChecker = groundCheckerMarker.transform;
+        _checkCharacterGrounded = new CheckCharacterGrounded(groundChecker, _groundMask);
 
-        CharacterController characterController = GetComponent<CharacterController>();
-        _characterGravity = new CharacterGravity(_characterGravityForce, characterController);
+        _characterController = GetComponent<CharacterController>();
+        _characterGravity = new CharacterGravity(_characterGravityForce, _characterController);
 
         Animator animator = GetComponent<Animator>();
         _characterAnimatorController = new CharacterAnimatorController(animator);
@@ -55,6 +56,9 @@ public abstract class PlayerMotor : MonoBehaviour
     private void Update()
     {
         OnCameraLook();
+        OnMove();
+        
+         _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
     }
 
     private void OnCameraLook()
@@ -69,6 +73,15 @@ public abstract class PlayerMotor : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0, _yRotation, 0);
     }
+
+    private void OnMove()
+    {
+        Vector2 moveInput = _inputControlsScript.Move;
+        move = transform.right * moveInput.x + transform.forward * moveInput.y;
+
+        float currentSpeed = _inputControlsScript.IsRun ? _speedRun : _speedWalk;
+        _characterController.Move(move * currentSpeed * Time.deltaTime);
+    }
     private void OnUse()
     {
         Debug.Log("Use item");
@@ -76,9 +89,10 @@ public abstract class PlayerMotor : MonoBehaviour
 
     private void OnJump()
     {
-        if (_isGrounded)
+        bool IsGrounded = _checkCharacterGrounded.CheckIsGrounded();
+        if (IsGrounded)
         {
-            _playerGravity.y = Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce);
+            _characterGravity.SetYVelocity(Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce));
         }
     }
 

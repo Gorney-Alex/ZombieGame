@@ -3,7 +3,7 @@ using UnityEngine;
 public class CheckCharacterGrounded
 {
     private LayerMask _groundMask;
-    private float _groundDistance = 0.4f;
+    private const float GROUND_DISTANCE = 0.4f;
 
     private Transform _groundChecker;
 
@@ -15,7 +15,7 @@ public class CheckCharacterGrounded
 
     public bool CheckIsGrounded()
     {
-        return Physics.CheckSphere(_groundChecker.position, _groundDistance, _groundMask);
+        return Physics.CheckSphere(_groundChecker.position, GROUND_DISTANCE, _groundMask);
     }
 
 
