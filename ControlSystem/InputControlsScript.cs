@@ -7,7 +7,7 @@ public class InputControlsScript : MonoBehaviour
     [SerializeField] private Vector2 _move;
     [SerializeField] private Vector2 _look;
     [SerializeField] private bool _isRun;
-    [SerializeField] private bool _isCrouching;
+    [SerializeField] private bool _isCrouchedState = false;
 
     public UnityEvent UseEvent = new();
     public UnityEvent JumpEvent = new();
@@ -16,7 +16,7 @@ public class InputControlsScript : MonoBehaviour
     public Vector2 Move => _move;
     public Vector2 Look => _look;
     public bool IsRun => _isRun;
-    public bool IsCrouching => _isCrouching; // <- добавлен геттер
+    public bool IsCrouchedState => _isCrouchedState;
 
     private void OnMove(InputValue moveValue)
     {
@@ -49,7 +49,8 @@ public class InputControlsScript : MonoBehaviour
     {
         if (crouchValue.isPressed)
         {
-            _isCrouching = !_isCrouching;
+            _isCrouchedState = !_isCrouchedState;
+            Debug.Log(_isCrouchedState);
             CrouchEvent?.Invoke();
         }
     }

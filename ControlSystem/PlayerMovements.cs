@@ -12,6 +12,10 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private const float SPINE_MAX_TILT = 30;
     private const string IS_WALK = "_isWalk";
     private const string IS_RUN = "_isRun";
+    private const string IS_CROUCH_DOWN = "_isCrouchDown";
+    private const string IS_CROUCH_UP = "_isCrouchUp";
+    private const string IS_CROUCH_IDLE = "_isCrouchIdle";
+    private const string IS_CROUCH_WALK = "_isCrouchWalk";
     [SerializeField] private LayerMask _groundMask;
     [SerializeField] private Transform _groundChecker;
 
@@ -23,9 +27,7 @@ public class PlayerMovements : MonoBehaviour
     [SerializeField] private float _standingHeight = 2.6f;
     [SerializeField] private float _crouchingHeight = 1.8f;
     [SerializeField] private float _crouchSpeed = 5f;
-    [SerializeField] private string IS_CROUCH = "_isCrouch";
-
-    private bool _isCrouched = false;
+    
 
     private float _xRoatation = 0;
     private float _yRoatation = 0;
@@ -113,32 +115,35 @@ public class PlayerMovements : MonoBehaviour
 
     private void OnCrouch()
     {
-        bool wantToCrouch = !_inputControlsScript.IsCrouching;
-
-        // if (!wantToCrouch && Physics.SphereCast(transform.position, 0.3f, Vector3.up, out _, 1f, _groundMask))
-        // {
-        //     Debug.Log("Нельзя встать: над головой препятствие");
-        //     return;
-        // }
-
-        typeof(InputControlsScript)
-            .GetField("_isCrouching", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.SetValue(_inputControlsScript, wantToCrouch);
-
-        _characterController.height = wantToCrouch ? _crouchingHeight : _standingHeight;
-        _characterController.center = new Vector3(0, _characterController.height / 2f, 0);
+        float newHeight = _inputControlsScript.IsCrouchedState ? _crouchingHeight : _standingHeight;
+        _characterController.height = newHeight;
+        _characterController.center = new Vector3(0, newHeight / 2f, 0);
     }
 
     private void UpdateMovementState()
     {
         float moveAmount = new Vector2(move.x, move.z).magnitude;
-        
         bool isWalking = moveAmount > 0.1f;
-        
         bool isRunning = isWalking && _inputControlsScript.IsRun;
+        bool isCrouched = _inputControlsScript.IsCrouchedState;
+
+        // Обновляем основные состояния
+        _animator.SetBool(IS_WALK, isWalking && !isRunning && !isCrouched);
+        _animator.SetBool(IS_RUN, isRunning && !isCrouched);
         
-        _animator.SetBool(IS_WALK, isWalking && !isRunning);
-        _animator.SetBool(IS_RUN, isRunning);
+        // Приседание: Idle или Walk в зависимости от движения
+        _animator.SetBool(IS_CROUCH_IDLE, isCrouched && !isWalking);
+        _animator.SetBool(IS_CROUCH_WALK, isCrouched && isWalking);
+
+        // Приседание вниз / вверх - это одиночный триггер
+        if (isCrouched)
+        {
+            _animator.SetTrigger(IS_CROUCH_DOWN);
+        }
+        else
+        {
+            _animator.SetTrigger(IS_CROUCH_UP);
+        }
     }
 
     private void OnUse()
