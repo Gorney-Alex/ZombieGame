@@ -127,15 +127,12 @@ public class PlayerMovements : MonoBehaviour
         bool isRunning = isWalking && _inputControlsScript.IsRun;
         bool isCrouched = _inputControlsScript.IsCrouchedState;
 
-        // Обновляем основные состояния
         _animator.SetBool(IS_WALK, isWalking && !isRunning && !isCrouched);
         _animator.SetBool(IS_RUN, isRunning && !isCrouched);
         
-        // Приседание: Idle или Walk в зависимости от движения
         _animator.SetBool(IS_CROUCH_IDLE, isCrouched && !isWalking);
         _animator.SetBool(IS_CROUCH_WALK, isCrouched && isWalking);
 
-        // Приседание вниз / вверх - это одиночный триггер
         if (isCrouched)
         {
             _animator.SetTrigger(IS_CROUCH_DOWN);

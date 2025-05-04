@@ -8,6 +8,7 @@ public class PlayerMotor : MonoBehaviour
     private CharacterGravity _characterGravity;
     private CharacterAnimatorController _characterAnimatorController;
     private CheckCharacterGrounded _checkCharacterGrounded;
+    private PlayerBoneController _playerBoneController;
     [SerializeField] private InputControlsScript _inputControlsScript;
 
     private float _characterGravityForce = -20f;
@@ -26,7 +27,7 @@ public class PlayerMotor : MonoBehaviour
     
     private float _xRotation = 0;
     private float _yRotation = 0;
-    Vector3 move;
+    private Vector3 _move;
 
     [SerializeField] private LayerMask _groundMask;
 
@@ -47,6 +48,13 @@ public class PlayerMotor : MonoBehaviour
         Animator animator = GetComponent<Animator>();
         _characterAnimatorController = new CharacterAnimatorController(animator);
 
+        var spineBone = GetComponentInChildren<StomachBoneMarker>()?.transform;
+        var chestBone = GetComponentInChildren<ChestBoneMarker>()?.transform;
+        var neckBone = GetComponentInChildren<NeckBoneMarker>()?.transform;
+        var headBone = GetComponentInChildren<HeadBoneMarker>()?.transform;
+
+        _playerBoneController = new PlayerBoneController(spineBone, chestBone, neckBone, headBone);
+
 
         _inputControlsScript.JumpEvent.AddListener(OnJump);
         _inputControlsScript.UseEvent.AddListener(OnUse);
@@ -57,8 +65,13 @@ public class PlayerMotor : MonoBehaviour
     {
         OnCameraLook();
         OnMove();
-        
-         _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
+        _characterAnimatorController.UpdateMovementState(_move, _inputControlsScript.IsRun, _inputControlsScript.IsCrouchedState);
+        _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
+    }
+
+    private void LateUpdate()
+    {
+        _playerBoneController.UpdateBonesRotation(_xRotation);
     }
 
     private void OnCameraLook()
@@ -77,10 +90,10 @@ public class PlayerMotor : MonoBehaviour
     private void OnMove()
     {
         Vector2 moveInput = _inputControlsScript.Move;
-        move = transform.right * moveInput.x + transform.forward * moveInput.y;
+        _move = transform.right * moveInput.x + transform.forward * moveInput.y;
 
         float currentSpeed = _inputControlsScript.IsRun ? _speedRun : _speedWalk;
-        _characterController.Move(move * currentSpeed * Time.deltaTime);
+        _characterController.Move(_move * currentSpeed * Time.deltaTime);
     }
     private void OnUse()
     {

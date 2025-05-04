@@ -17,7 +17,7 @@ public class PlayerBoneController : MonoBehaviour
         _headBone = headBone;
     }
 
-    private void UpdateBonesRotation(float xRoatation)
+    public void UpdateBonesRotation(float xRoatation)
     {
         float tilt = Mathf.Clamp(xRoatation, -SPINE_MAX_TILT, SPINE_MAX_TILT);
 

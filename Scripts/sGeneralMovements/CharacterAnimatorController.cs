@@ -8,7 +8,9 @@ public class CharacterAnimatorController
     private const string IS_CROUCH_UP = "_isCrouchUp";
     private const string IS_CROUCH_IDLE = "_isCrouchIdle";
     private const string IS_CROUCH_WALK = "_isCrouchWalk";
+    
     private Animator _animator;
+    private bool _previousCrouchState = false; // Добавляем отслеживание предыдущего состояния
 
     public CharacterAnimatorController(Animator animator)
     {
@@ -27,13 +29,9 @@ public class CharacterAnimatorController
         _animator.SetBool(IS_CROUCH_IDLE, IsControlsScriptCrouching && !isWalking);
         _animator.SetBool(IS_CROUCH_WALK, IsControlsScriptCrouching && isWalking);
 
-        if (IsControlsScriptCrouching)
-        {
-            _animator.SetTrigger(IS_CROUCH_DOWN);
-        }
-        else
-        {
-            _animator.SetTrigger(IS_CROUCH_UP);
-        }
+
+        _animator.SetBool(IS_CROUCH_DOWN, IsControlsScriptCrouching);
+        _animator.SetBool(IS_CROUCH_UP, !IsControlsScriptCrouching);
+
     }
 }

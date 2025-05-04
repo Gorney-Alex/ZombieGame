@@ -50,7 +50,6 @@ public class InputControlsScript : MonoBehaviour
         if (crouchValue.isPressed)
         {
             _isCrouchedState = !_isCrouchedState;
-            Debug.Log(_isCrouchedState);
             CrouchEvent?.Invoke();
         }
     }
