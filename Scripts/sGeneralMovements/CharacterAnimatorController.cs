@@ -8,30 +8,31 @@ public class CharacterAnimatorController
     private const string IS_CROUCH_UP = "_isCrouchUp";
     private const string IS_CROUCH_IDLE = "_isCrouchIdle";
     private const string IS_CROUCH_WALK = "_isCrouchWalk";
+    private const string IS_CROUCH_JUMP_UP = "_isJumpUp";
     
     private Animator _animator;
-    private bool _previousCrouchState = false; // Добавляем отслеживание предыдущего состояния
 
     public CharacterAnimatorController(Animator animator)
     {
         _animator = animator;
     }
 
-    public void UpdateMovementState(Vector3 moveDirection, bool IsControlsScriptRunning, bool IsControlsScriptCrouching)
+    public void UpdateMovementState(Vector3 moveDirection, bool IsControlsScriptRunning, bool IsControlsScriptCrouching, bool IsJump)
     {
         float moveAmount = new Vector2(moveDirection.x, moveDirection.z).magnitude;
         bool isWalking = moveAmount > 0.1f;
         bool isRunning = isWalking && IsControlsScriptRunning;
         
-        _animator.SetBool(IS_WALK, isWalking && !isRunning && !IsControlsScriptCrouching);
-        _animator.SetBool(IS_RUN, isRunning && !IsControlsScriptCrouching);
+        _animator.SetBool(IS_CROUCH_JUMP_UP, IsJump && !IsControlsScriptCrouching);
+        
+        _animator.SetBool(IS_WALK, isWalking && !isRunning && !IsControlsScriptCrouching && !IsJump);
+        _animator.SetBool(IS_RUN, isRunning && !IsControlsScriptCrouching && !IsJump);
 
-        _animator.SetBool(IS_CROUCH_IDLE, IsControlsScriptCrouching && !isWalking);
-        _animator.SetBool(IS_CROUCH_WALK, IsControlsScriptCrouching && isWalking);
+        _animator.SetBool(IS_CROUCH_IDLE, IsControlsScriptCrouching && !isWalking && !IsJump);
+        _animator.SetBool(IS_CROUCH_WALK, IsControlsScriptCrouching && isWalking && !IsJump);
 
-
-        _animator.SetBool(IS_CROUCH_DOWN, IsControlsScriptCrouching);
-        _animator.SetBool(IS_CROUCH_UP, !IsControlsScriptCrouching);
+        _animator.SetBool(IS_CROUCH_DOWN, IsControlsScriptCrouching && !IsJump);
+        _animator.SetBool(IS_CROUCH_UP, !IsControlsScriptCrouching && !IsJump);
 
     }
 }

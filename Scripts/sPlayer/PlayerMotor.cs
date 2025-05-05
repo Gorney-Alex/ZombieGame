@@ -61,12 +61,17 @@ public class PlayerMotor : MonoBehaviour
         _inputControlsScript.CrouchEvent.AddListener(OnCrouch);
     }
 
+    private void FixedUpdate()
+    {
+        _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
+        if (_checkCharacterGrounded.CheckIsGrounded()) { _inputControlsScript.JumpEnd(); }
+    }
+
     private void Update()
     {
         OnCameraLook();
         OnMove();
-        _characterAnimatorController.UpdateMovementState(_move, _inputControlsScript.IsRun, _inputControlsScript.IsCrouchedState);
-        _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
+        _characterAnimatorController.UpdateMovementState(_move, _inputControlsScript.IsRun, _inputControlsScript.IsCrouchedState, _inputControlsScript.IsJump);
     }
 
     private void LateUpdate()
@@ -105,6 +110,7 @@ public class PlayerMotor : MonoBehaviour
         bool IsGrounded = _checkCharacterGrounded.CheckIsGrounded();
         if (IsGrounded)
         {
+            Debug.Log(_inputControlsScript.IsJump);
             _characterGravity.SetYVelocity(Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce));
         }
     }
