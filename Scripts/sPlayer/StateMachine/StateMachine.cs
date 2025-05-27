@@ -2,31 +2,37 @@ using UnityEngine;
 
 public class StateMachine : MonoBehaviour
 {
-    public State CurrentState { get; private set; }
+    private State _currentState;
+
+    public void OnServerInitialized(State startAnimation)
+    {
+        _currentState = startAnimation;
+        _currentState.Enter();
+    }
 
     public void ChangeState(State NewState)
     {
-        if (CurrentState != null)
+        if (_currentState != null)
         {
-            CurrentState.Exit();
+            _currentState.Exit();
         }
-        CurrentState = NewState;
-        CurrentState.Enter();
+        _currentState = NewState;
+        _currentState.Enter();
     }
 
     private void Update()
     {
-        if (CurrentState != null)
+        if (_currentState != null)
         {
-            CurrentState.Do();
+            _currentState.Do();
         }
     }
 
     private void FixedUpdate()
     {
-        if (CurrentState != null)
+        if (_currentState != null)
         {
-            CurrentState.Do();
+            _currentState.Do();
         }
     }
 }
