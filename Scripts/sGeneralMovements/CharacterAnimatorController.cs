@@ -8,7 +8,7 @@ public class CharacterAnimatorController
     private const string IS_CROUCH_UP = "_isCrouchUp";
     private const string IS_CROUCH_IDLE = "_isCrouchIdle";
     private const string IS_CROUCH_WALK = "_isCrouchWalk";
-    private const string IS_CROUCH_JUMP_UP = "_isJumpUp";
+    private const string IS_JUMP_UP = "_isJumpUp";
     
     private Animator _animator;
 
@@ -23,16 +23,23 @@ public class CharacterAnimatorController
         bool isWalking = moveAmount > 0.1f;
         bool isRunning = isWalking && IsControlsScriptRunning;
         
-        _animator.SetBool(IS_CROUCH_JUMP_UP, IsJump && !IsControlsScriptCrouching);
+        if(IsControlsScriptCrouching)
+        {
+            _animator.SetBool(IS_CROUCH_DOWN, true);
+            _animator.SetBool(IS_CROUCH_IDLE, true && !isWalking);
+            _animator.SetBool(IS_CROUCH_WALK, isWalking);
+        }
         
-        _animator.SetBool(IS_WALK, isWalking && !isRunning && !IsControlsScriptCrouching && !IsJump);
-        _animator.SetBool(IS_RUN, isRunning && !IsControlsScriptCrouching && !IsJump);
+        _animator.SetBool(IS_CROUCH_UP, !IsControlsScriptCrouching);
 
-        _animator.SetBool(IS_CROUCH_IDLE, IsControlsScriptCrouching && !isWalking && !IsJump);
-        _animator.SetBool(IS_CROUCH_WALK, IsControlsScriptCrouching && isWalking && !IsJump);
 
-        _animator.SetBool(IS_CROUCH_DOWN, IsControlsScriptCrouching && !IsJump);
-        _animator.SetBool(IS_CROUCH_UP, !IsControlsScriptCrouching && !IsJump);
+        _animator.SetBool(IS_JUMP_UP, IsJump);
+        
+        _animator.SetBool(IS_WALK, isWalking);
+        _animator.SetBool(IS_RUN, isRunning);
+
+
 
     }
+
 }

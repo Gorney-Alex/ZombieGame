@@ -9,6 +9,7 @@ public class PlayerMotor : MonoBehaviour
     private CharacterAnimatorController _characterAnimatorController;
     private CheckCharacterGrounded _checkCharacterGrounded;
     private PlayerBoneController _playerBoneController;
+    private StateMachine _stateMachine;
     [SerializeField] private InputControlsScript _inputControlsScript;
 
     private float _characterGravityForce = -20f;
@@ -64,6 +65,7 @@ public class PlayerMotor : MonoBehaviour
     private void FixedUpdate()
     {
         _characterGravity.CharacterGravityUpdate(_checkCharacterGrounded.CheckIsGrounded());
+        
         if (_checkCharacterGrounded.CheckIsGrounded()) { _inputControlsScript.JumpEnd(); }
     }
 
@@ -110,7 +112,6 @@ public class PlayerMotor : MonoBehaviour
         bool IsGrounded = _checkCharacterGrounded.CheckIsGrounded();
         if (IsGrounded)
         {
-            Debug.Log(_inputControlsScript.IsJump);
             _characterGravity.SetYVelocity(Mathf.Sqrt(_jumpForce * -2f * _characterGravityForce));
         }
     }

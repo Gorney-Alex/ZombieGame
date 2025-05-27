@@ -3,7 +3,7 @@ using UnityEngine;
 public class CheckCharacterGrounded
 {
     private LayerMask _groundMask;
-    private const float GROUND_DISTANCE = 0.4f;
+    private const float GROUND_DISTANCE = 0.3f;
 
     private Transform _groundChecker;
 
